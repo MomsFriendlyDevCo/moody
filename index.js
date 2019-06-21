@@ -17,8 +17,16 @@ function Dynamoosey() {
 	dy.dynalite;
 
 	dy.settings = {
-		dynalite: true,
-		dynalitePort: 8000,
+		dynalite: {
+			enabled: true,
+			port: 8000,
+			path: undefined,
+			ssl: false,
+			createTableMs: 500,
+			deleteTableMs: 500,
+			updateTableMs: 500,
+			maxItemSizeKb: 400,
+		},
 		aws: {
 			accessKeyId: 'AKID',
 			secretAccessKey: 'SECRET',
@@ -28,16 +36,32 @@ function Dynamoosey() {
 
 
 	/**
+	* Set a single setting by key or merge config
+	* @param {Object|string|array} key Either a single key (dotted string / array notation are supported) or an object to merge into the settings
+	* @param {*} [val] The value to set if key is a path
+	* @returns {Dynamoosey} This Dynamoosey instance
+	*/
+	dy.set = (key, val) => {
+		if (_.isPlainObject(key)) {
+			_.mergeDeep(dy.settings, key);
+		} else {
+			_.set(dy.settings, key, val);
+		}
+		return dy;
+	};
+
+
+	/**
 	* Setup a connection to either Dynalite (spawned if needed) or AWS
 	* @returns {Promise <Dynamoosey>} A promise which will resolve with the active Dynamoosey instance when completed
 	*/
 	dy.connect = options => Promise.resolve()
 		.then(()=> {
-			if (dy.settings.dynalite) {
-				debug('Spawning dynalite service on port', dy.settings.dynalitePort);
-				dy.dynalite = dynalite();
+			if (dy.settings.dynalite.enabled) {
+				debug('Spawning dynalite service on port', dy.settings.dynalite.port);
+				dy.dynalite = dynalite(dy.settings.dynalite);
 				return new Promise((resolve, reject) => {
-					dy.dynalite.listen(dy.settings.dynalitePort, err => {
+					dy.dynalite.listen(dy.settings.dynalite.port, err => {
 						if (err) return reject(err);
 						debug('Connected to Dynalite');
 						resolve();
@@ -51,7 +75,7 @@ function Dynamoosey() {
 			...dy.settings.aws,
 			...options,
 		}))
-		.then(()=> dy.settings.dynalite && dy.dynamoose.local())
+		.then(()=> dy.settings.dynalite.enabled && dy.dynamoose.local())
 		.then(()=> dy)
 
 
