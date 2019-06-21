@@ -7,6 +7,10 @@ module.exports = function(dy, id, schema) {
 	dym.id = id;
 	dym.schema = schema;
 
+	dym.settings = {
+		idField: 'id',
+	};
+
 	// Tidy schema {{{
 	var tidySchema = (node, path = [], offset) => {
 		if (_.isArray(node)) {
@@ -93,7 +97,9 @@ module.exports = function(dy, id, schema) {
 	* @param {Object} [query] Initial filtering criteria to apply
 	* @returns {DynamooseyQuery} The query object + Promise
 	*/
-	dym.find = query => new dy.Query(dym, query);
+	dym.find = query =>
+		new dy.Query(dym)
+			.find(query);
 
 
 	/**
@@ -101,7 +107,31 @@ module.exports = function(dy, id, schema) {
 	* @param {Object} [query] Initial filtering criteria to apply
 	* @returns {DynamooseyQuery} The query object + Promise
 	*/
-	dym.findOne = query => new dy.Query(dym, query).limit(1);
+	dym.findOne = query =>
+		new dy.Query(dym)
+			.find(query)
+			.one();
+
+
+	/**
+	* Create a query instance that returns one document by its ID
+	* @param {string} id The ID of the document to return
+	* @returns {DynamooseyQuery} The query object + Promise
+	*/
+	dym.findOneById = dym.findOneByID = id =>
+		new dy.Query(dym)
+			.find({[dym.settings.idField]: id})
+			.one();
+
+
+	/**
+	* Create a query instance in count mode with an optional filter
+	* @param {Object} [query] Optional query to use
+	* @returns {DynamooseyQuery} The query object + Promise
+	*/
+	dym.count = query =>
+		new dy.Query(dym)
+			.count(query);
 
 
 	/**

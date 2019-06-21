@@ -5,8 +5,14 @@ module.exports = function DynamooseyQuery(model, filter) {
 	dyq.dy = model.dy;
 	dyq.model = model;
 
-	dyq.filters = {};
-	dyq.sort = [];
+	dyq.query = {
+		count: false,
+		limit: 0,
+		filters: {},
+		select: [],
+		sort: [],
+		flatten: false,
+	};
 
 
 	/**
@@ -15,7 +21,7 @@ module.exports = function DynamooseyQuery(model, filter) {
 	* @returns {DynamooseQuery} This chainable query
 	*/
 	dyq.find = query => {
-		Object.assign(dyq.filters, query);
+		Object.assign(dyq.query.filters, query);
 		return dyq;
 	};
 
@@ -24,15 +30,84 @@ module.exports = function DynamooseyQuery(model, filter) {
 
 
 	/**
+	* Mark the query as a count - which will only return the number of matches
+	* @param {Object} query Optional to append
+	* @returns {DynamooseQuery} This chainable query
+	*/
+	dyq.count = query => {
+		dyq.query.count = true;
+		return dyq.find(query);
+	};
+
+
+	/**
+	* Set the limit of documents
+	* If the value is zero, falsy or Infinity the limit is disabled
+	* @param {*} limit The limit to set
+	* @returns {DynamooseQuery} This chainable query
+	*/
+	dyq.limit = limit => {
+		dyq.query.limit =
+			!limit || limit === Infinity ? 0
+			: limit;
+
+		return dyq;
+	};
+
+
+	/**
+	* Set the fields to return (or "Project" to use proper DB terminology)
+	* Fields can be specified in array or CSV form
+	* @param {string|array} fields... Fields to return
+	* @returns {DynamooseQuery} This chainable query
+	*/
+	dyq.select = (...fields) => {
+		dyq.query.select = Array.from(new Set(
+			fields.flatMap(f =>
+				(
+					_.isString(f) ? f.split(/\s*,\s*/)
+					: f
+				)
+		)));
+		console.log('UNTESTED SELECT NOW', dyq.query.select);
+
+		return dyq;
+	}
+
+
+	/**
+	* Set that we are only interested in the first match and it should be returned directly as an object rather than an array of matches
+	* @returns {DynamooseQuery} This chainable query
+	*/
+	dyq.one = ()=> {
+		dyq.query.limit = 1;
+		dyq.query.flatten = true;
+		return dyq;
+	};
+
+
+	/**
 	* Execute the query and return a promise
 	* @returns {Promise <Object|array|undefined>} A promise which returns the found document, collection of documents or undefined
 	*/
 	dyq.promise = ()=> new Promise((resolve, reject) => {
-		debug('Execute query', {filters: dyq.filters, sort: dyq.sort});
-		dyq.model.model.scan(dyq.filters).exec((err, res) => {
-			debug('Found', res.length, 'docs from query');
+		debug('Execute query', dyq.query);
+
+		var q = dyq.model.model.scan(dyq.query.filters);
+		if (dyq.query.count) q.count();
+
+		q.exec((err, res) => {
 			if (err) return reject(err);
-			resolve(res);
+			if (dyq.query.count) {
+				debug('Counted', res[0], 'docs from query');
+				resolve(res[0]);
+			} else if (dyq.query.flatten) {
+				debug('Returned first match');
+				resolve(res[0]);
+			} else {
+				debug('Found', res.length, 'docs from query');
+				resolve(dyq.query.flatten ? res[0] : res);
+			}
 		});
 	});
 

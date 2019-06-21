@@ -53,7 +53,13 @@ function Dynamoosey() {
 		.then(()=> dy.settings.dynalite && dy.dynamoose.local())
 		.then(()=> dy)
 
-	dy.disconnect = ()=> { throw new Error('dy.disconnect() not yet supported') };
+
+	/**
+	* Terminate outstanding connections and cleanup
+	* @returns {Promise} A promise which will resolve after cleanup
+	*/
+	dy.disconnect = ()=> Promise.resolve()
+		.then(()=> dy.dynalite && dy.dynalite.close())
 
 
 	/**

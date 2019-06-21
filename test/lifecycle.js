@@ -6,6 +6,7 @@ describe('Document lifecycle', function() {
 
 	var dy;
 	before('setup', ()=> dynamoosey.connect().then(res => dy = res))
+	after('disconnect', ()=> dy.disconnect());
 
 	it('should create a schema', ()=> dy.schema('widgets', {
 		id: {type: 'oid'},
@@ -52,8 +53,20 @@ describe('Document lifecycle', function() {
 		})
 	);
 
-	it('should query one document', function() {
+	it('should count all documents', ()=> dy.models.widgets.count().then(res => expect(res).to.be.equal(4)))
+
+	it('should count via a query', ()=> dy.models.widgets.count({color: 'red'}).then(res => expect(res).to.be.equal(2)))
+
+	it('should query one document - via query', function() {
 		if (!createdFoo) return this.skip;
+		return dy.models.widgets.findOne({title: 'Foo'})
+			.then(res => expect(res).to.deep.equal(createdFoo))
+	});
+
+	it('should query one document - via ID', function() {
+		if (!createdFoo) return this.skip;
+		return dy.models.widgets.findOneByID(createdFoo.id)
+			.then(res => expect(res).to.deep.equal(createdFoo))
 	});
 
 	it.skip('should delete documents', ()=> dy.models.widgets.deleteMany({color: 'red'}));
