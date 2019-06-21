@@ -7,10 +7,11 @@ var promisify = require('util').promisify;
 function Dynamoosey() {
 	var dy = this;
 
-	dy.Model = require('./classes/model');
-	dy.Query = require('./classes/query');
-	dy.oids = require('./classes/oids');
-	dy.utils = require('./classes/utils');
+	dy.Model = require('./lib/model');
+	dy.Query = require('./lib/query');
+	dy.oids = require('./lib/oids');
+	dy.RestServer = require('./lib/rest');
+	dy.utils = require('./lib/utils');
 
 	dy.dynamoose = dynamoose;
 	dy.dynalite;
