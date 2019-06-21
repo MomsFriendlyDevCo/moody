@@ -47,12 +47,16 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 
 **TODO:**
 
+* [x] Basic implementation
+* [x] [CRUD lifecycle](https://en.wikipedia.org/wiki/Create,_read,_update_and_delete)
+* [x] Testkits
+* [x] ReST server
 * [ ] query.select is not honored during a query
 * [ ] query.limit is not honored during a query
 * [ ] query.skip is not honored during a query
 * [ ] query.sort is not honored during a query
-* Deep schema validation
-* dy.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
+* [ ] Deep schema validation
+* [ ] dy.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
 * [ ] `model.updateMany()`, `model.deleteMany()` could be improved by using better logic to reuse indexes rather than doing a query to fetch the ID's then acting on those
 
 
