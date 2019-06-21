@@ -46,6 +46,24 @@ module.exports = function DynamooseyQuery(model, filter) {
 	dyq.then = (...args) => dyq.promise().then(...args);
 
 
+	/**
+	* Return a promise and immediately execute it as a catch
+	* This is really just an alias for dyq.promise().catch(...)
+	* @param {*} args... Callback to run
+	* @returns {Promise}
+	*/
+	dyq.catch = (...args) => dyq.promise().catch(...args);
+
+
+	/**
+	* Return a promise and immediately execute it as a finally block
+	* This is really just an alias for dyq.promise().finally(...)
+	* @param {*} args... Callback to run
+	* @returns {Promise}
+	*/
+	dyq.finally = (...args) => dyq.promise().finally(...args);
+
+
 
 	return dyq;
 };
