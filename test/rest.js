@@ -4,6 +4,7 @@ var dynamoosey = require('..');
 var expect = require('chai').expect;
 var express = require('express');
 var expressLogger = require('express-log-url');
+var os = require('os');
 
 var port = 8181;
 var url = 'http://localhost:' + port;
@@ -15,7 +16,7 @@ describe('ReST server', function() {
 	var dy;
 	before('setup dynamoosey', ()=>
 		dynamoosey
-			.set('dynalite.path', `${__dirname}/testkit.db`)
+			.set('dynalite.path', `${os.tmpdir()}/dynamoosey-testkit.db`)
 			.connect()
 			.then(res => dy = res)
 	)

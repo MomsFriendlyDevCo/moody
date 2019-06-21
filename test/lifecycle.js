@@ -35,7 +35,7 @@ describe('Document lifecycle', function() {
 		})
 	);
 
-	it('should create many documents', ()=> dy.models.widgets.insertMany([
+	it('should create many documents', ()=> dy.models.widgets.createMany([
 		{title: 'Bar', color: 'red'},
 		{title: 'Baz', color: 'blue'},
 		{title: 'Quz'},
