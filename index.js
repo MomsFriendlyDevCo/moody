@@ -17,6 +17,10 @@ function Dynamoosey() {
 	dy.dynalite;
 
 	dy.settings = {
+		createMany: {
+			threads: 1,
+			batchSize: 100,
+		},
 		dynalite: {
 			enabled: true,
 			port: 8000,
