@@ -8,6 +8,7 @@ function Dynamoosey() {
 	var dy = this;
 
 	dy.Model = require('./classes/model');
+	dy.Query = require('./classes/query');
 	dy.oids = require('./classes/oids');
 	dy.utils = require('./classes/utils');
 

@@ -18,6 +18,7 @@ describe('Document lifecycle', function() {
 		expect(dy.models.widgets).to.be.an.instanceOf(dynamoosey.Model);
 	});
 
+	var createdFoo;
 	it('should create a document from the schema', ()=> Promise.resolve()
 		.then(()=> dy.models.widgets.create({
 			title: 'Foo',
@@ -28,6 +29,7 @@ describe('Document lifecycle', function() {
 			expect(doc).to.have.property('title', 'Foo');
 			expect(doc).to.have.property('id');
 			expect(doc.id).to.satisfy(dy.oids.isOid);
+			createdFoo = doc;
 		})
 	);
 
@@ -50,6 +52,10 @@ describe('Document lifecycle', function() {
 		})
 	);
 
-	it('should delete documents', ()=> dy.models.widgets.deleteMany({color: 'red'}));
+	it('should query one document', function() {
+		if (!createdFoo) return this.skip;
+	});
+
+	it.skip('should delete documents', ()=> dy.models.widgets.deleteMany({color: 'red'}));
 
 });

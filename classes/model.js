@@ -51,12 +51,22 @@ module.exports = function(dy, id, schema) {
 	}
 	// }}}
 
+	/**
+	* Dynamoose handle for the model
+	* @var {DynamooseModel}
+	*/
 	debug('Create model', dym.id);
 	dym.model = dy.dynamoose.model(dym.id, tidySchema(dym.schema), {
 		prefix: '',
 		suffix: '',
 	});
 
+
+	/**
+	* Crete a single document and return it
+	* @param {Object} doc The document to create
+	* @returns {Promise <Object>} A promise which will resolve with the created document
+	*/
 	dym.create = doc => new Promise((resolve, reject) => {
 		debug('Create doc', doc);
 		dym.model.create(doc, (err, created) => {
@@ -77,14 +87,21 @@ module.exports = function(dy, id, schema) {
 		.then(()=> Promise.all(docs.map(doc => dym.create(doc))));
 
 
-	dym.find = query => new Promise((resolve, reject) => {
-		debug('Find docs', query);
-		dym.model.scan(query).exec((err, res) => {
-			debug('Found', res.length, 'docs from query', query);
-			if (err) return reject(err);
-			resolve(res);
-		});
-	});
+
+	/**
+	* Create a query instance which acts like a promise
+	* @param {Object} [query] Initial filtering criteria to apply
+	* @returns {DynamooseyQuery} The query object + Promise
+	*/
+	dym.find = query => new dy.Query(dym, query);
+
+
+	/**
+	* Create a query instance that returns one document
+	* @param {Object} [query] Initial filtering criteria to apply
+	* @returns {DynamooseyQuery} The query object + Promise
+	*/
+	dym.findOne = query => new dy.Query(dym, query).limit(1);
 
 
 	/**
@@ -98,6 +115,20 @@ module.exports = function(dy, id, schema) {
 			resolve();
 		});
 	});
+
+
+	/**
+	* Return whether an index exists which matches the query
+	* @param {Object} query The query to examine
+	* @returns {string|undefined} The name of the index if one exists
+	*/
+	dym.matchIndex = query => {
+		var fields = _.keys(query);
+
+		return dym.model.getTableReq().KeySchema
+			.find(ks => _.isEqual(ks.AttributeName, fields));
+	};
+
 
 	dy.models[dym.id] = this;
 
