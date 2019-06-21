@@ -1,3 +1,4 @@
+var _ = require('lodash');
 var dynamoosey = require('..');
 var expect = require('chai').expect;
 
@@ -30,7 +31,7 @@ describe('Document lifecycle', function() {
 			expect(doc).to.have.property('title', 'Foo');
 			expect(doc).to.have.property('id');
 			expect(doc.id).to.satisfy(dy.oids.isOid);
-			createdFoo = doc;
+			createdFoo = _.toPlainObject(doc);
 		})
 	);
 
@@ -69,6 +70,39 @@ describe('Document lifecycle', function() {
 			.then(res => expect(res).to.deep.equal(createdFoo))
 	});
 
-	it.skip('should delete documents', ()=> dy.models.widgets.deleteMany({color: 'red'}));
+	it('should update a document - via query', function() {
+		if (!createdFoo) return this.skip;
+		return dy.models.widgets.updateOne({title: 'Foo'}, {color: 'purple'})
+			.then(res => expect(res).to.deep.equal({...createdFoo, color: 'purple'}))
+			.then(()=> dy.models.widgets.findOne({title: 'Foo'}))
+			.then(res => expect(res).to.deep.equal({...createdFoo, color: 'purple'}))
+	});
+
+	it('should update a document - via ID', function() {
+		if (!createdFoo) return this.skip;
+		return dy.models.widgets.updateOneByID(createdFoo.id, {color: 'orange'})
+			.then(res => expect(res).to.deep.equal({...createdFoo, color: 'orange'}))
+			.then(()=> dy.models.widgets.findOne({title: 'Foo'}))
+			.then(res => expect(res).to.deep.equal({...createdFoo, color: 'orange'}))
+	});
+
+	it('should one document by its ID', function() {
+		return dy.models.widgets.deleteOneByID(createdFoo.id)
+			.then(()=> dy.models.widgets.findOneByID(createdFoo.id))
+			.then(()=> this.fail)
+			.catch(()=> Promise.resolve())
+	});
+
+	it('should delete documents', ()=>
+		dy.models.widgets.deleteMany({color: 'red'})
+			.then(()=> dy.models.widgets.count({color: 'red'}))
+			.then(count => expect(count).to.be.equal(0))
+	);
+
+	it('should delete all documents', ()=>
+		dy.models.widgets.deleteMany()
+			.then(()=> dy.models.widgets.count())
+			.then(count => expect(count).to.be.equal(0))
+	);
 
 });
