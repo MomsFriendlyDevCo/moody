@@ -8,7 +8,11 @@
 
 **TODO:**
 
-* `model.updateMany()`, `model.deleteMany()` could be improved by them using better logic to reuse indexes rather than doing a query first
+* [ ] query.select is not honored
+* [ ] query.limit is not honored
+* [ ] query.skip is not honored
+* [ ] query.sort is not honored
+* [ ] `model.updateMany()`, `model.deleteMany()` could be improved by them using better logic to reuse indexes rather than doing a query first
 
 
 Debugging
