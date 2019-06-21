@@ -6,7 +6,7 @@ describe('Document lifecycle', function() {
 	this.timeout(5 * 1000);
 
 	var dy;
-	before('setup', ()=> dynamoosey.connect().then(res => dy = res))
+	before('setup dynamoosey', ()=> dynamoosey.connect().then(res => dy = res))
 	after('disconnect', ()=> dy.disconnect());
 
 	it('should create a schema', ()=> dy.schema('widgets', {
