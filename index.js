@@ -99,6 +99,8 @@ function Dynamoosey() {
 
 	dy.schema = (id, schema) => new dy.Model(dy, id, schema);
 
+	dy.serve = (model, options) => new dy.RestServer(dy.models[model], options);
+
 	return dy;
 };
 
