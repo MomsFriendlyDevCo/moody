@@ -14,6 +14,7 @@ Thin wrapper around Dynamoose, providing some additional functionality and bring
 * Usual collection of Mongoose like functionality: `model.count`, `model.find{,One,OneByID}`, `model.{delete,update}{OneByID,One,Many}`
 * Functionality to quickly load from a file - `model.loadData(path|collection)`
 * Express compatible ReST server out-of-the-box
+* `index` attribute can now take more shorthand values
 
 
 ```javascript
