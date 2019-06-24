@@ -12,6 +12,7 @@ function Dynamoosey() {
 	dy.oids = require('./lib/oids');
 	dy.RestServer = require('./lib/rest');
 	dy.utils = require('./lib/utils');
+	dy.scenario = input => require('./lib/scenario')(dy, input);
 
 	dy.dynamoose = dynamoose;
 	dy.dynalite;
