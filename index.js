@@ -48,7 +48,7 @@ function Dynamoosey() {
 	*/
 	dy.set = (key, val) => {
 		if (_.isPlainObject(key)) {
-			_.mergeDeep(dy.settings, key);
+			_.merge(dy.settings, key);
 		} else {
 			_.set(dy.settings, key, val);
 		}
