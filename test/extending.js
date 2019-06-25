@@ -55,4 +55,24 @@ describe('Extending', function() {
 			})
 	);
 
+	before('add a custom virtual', ()=> dy.models.people.virtual('intitals', function() {
+		return [this.firstName, this.middleName, this.lastName]
+			.filter(i => i)
+			.map(i => i.substr(0, 1))
+			.join('. ');
+	}));
+
+	it('should add a virtual getter', ()=>
+		dy.models.people.find()
+			.then(people => {
+				expect(people).to.be.an('array');
+				expect(people).to.have.length(3);
+				people.forEach(person => {
+					expect(person).to.have.property('initials');
+					expect(person.initials).to.be.a('string');
+					expect(person.initials).to.have.length.above(1);
+				});
+			})
+	);
+
 });
