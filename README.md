@@ -55,6 +55,7 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 * [x] Scenario support
 * [ ] Model.virtual()
 * [ ] Model.method()
+* [x] Model.static()
 * [ ] Model.emit() / Model.on()
 * [ ] query.select is not honored during a query
 * [ ] query.limit is not honored during a query
@@ -62,6 +63,8 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 * [ ] query.sort is not honored during a query
 * [ ] Deep schema validation
 * [ ] dy.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
+	- [ ] Testkit: Reject unknown fields
+* [ ] Scan warnings
 * [ ] `model.updateMany()`, `model.deleteMany()` could be improved by using better logic to reuse indexes rather than doing a query to fetch the ID's then acting on those
 
 
