@@ -146,7 +146,7 @@ describe('ReST server', function() {
 			.then(res => {
 				expect(res.data).to.be.an('array');
 				res.data.forEach(movie => {
-					expect(Object.keys(movie).sort()).to.deep.equal(['id', 'title', 'year']);
+					expect(Object.keys(movie).sort()).to.deep.equal(['id', 'title']);
 				});
 			})
 	);

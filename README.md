@@ -57,7 +57,8 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 * [x] Model.method()
 * [x] Model.static()
 * [ ] Model.emit() / Model.on()
-* [ ] query.select is not honored during a query
+* [ ] Model.serve properties: queryForce, queryValidate
+* [ ] query.select is not honored during a query (A software `_.pick()` call is used internally to simulate for now)
 * [ ] query.limit is not honored during a query
 * [ ] query.skip is not honored during a query
 * [ ] query.sort is not honored during a query
