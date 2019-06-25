@@ -7,6 +7,7 @@ var promisify = require('util').promisify;
 function Dynamoosey() {
 	var dy = this;
 
+	dy.Document = require('./lib/document');
 	dy.Model = require('./lib/model');
 	dy.Query = require('./lib/query');
 	dy.oids = require('./lib/oids');

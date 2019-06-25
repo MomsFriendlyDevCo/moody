@@ -54,7 +54,7 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 * [x] ReST server
 * [x] Scenario support
 * [ ] Model.virtual()
-* [ ] Model.method()
+* [x] Model.method()
 * [x] Model.static()
 * [ ] Model.emit() / Model.on()
 * [ ] query.select is not honored during a query
@@ -302,6 +302,34 @@ model.serve(options)
 Shorthand for `dynamoose.serve(id, options)`.
 
 
+model.static(name, func)
+------------------------
+Extend a DynamooseModel to include the named function. This is really just an easier way of handling mixins with models.
+
+```javascript
+// Create another way of counting users
+dy.models.users.static('countUsers', ()=> dy.model.users.count());
+
+dy.models.users.countUsers(); //= {Promise <Number>}
+```
+
+
+model.method(name, func)
+------------------------
+Extend a DynamooseDocument to include the named function. This function is effecively glued onto and documents returned via `find` (or its brethren).
+
+```javascript
+// Set the users status to invalid via a method
+dy.model.users.method('setInvalid', function() {
+	this.status = 'invalid';
+});
+
+dy.models.users.findOne({username: 'bad@user.com'})
+	.then(user => user.setInvalid())
+```
+
+
+
 query
 -----
 The Dynamoose query object.
@@ -341,6 +369,11 @@ Specify an array, CSV or list of sort criteria. Reverse sorting is provided by p
 query.one()
 -----------
 Return only the first match from a query as an object - rather than a collection.
+
+
+query.lean()
+------------
+Do not decorate the found documents with the model prototype - this skips the prototype methods being added.
 
 
 query.exec()
