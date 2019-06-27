@@ -1,27 +1,32 @@
 var _ = require('lodash');
-var debug = require('debug')('dynamoosey');
+var debug = require('debug')('moody');
 var dynalite = require('dynalite');
 var dynamoose = require('dynamoose');
 var promisify = require('util').promisify;
 
-function Dynamoosey() {
-	var dy = this;
+function Moody() {
+	var my = this;
 
-	dy.Document = require('./lib/document');
-	dy.Model = require('./lib/model');
-	dy.Query = require('./lib/query');
-	dy.oids = require('./lib/oids');
-	dy.RestServer = require('./lib/rest');
-	dy.utils = require('./lib/utils');
-	dy.scenario = input => require('./lib/scenario')(dy, input);
+	my.Document = require('./lib/document');
+	my.Model = require('./lib/model');
+	my.Query = require('./lib/query');
+	my.oids = require('./lib/oids');
+	my.RestServer = require('./lib/rest');
+	my.utils = require('./lib/utils');
+	my.scenario = input => require('./lib/scenario')(my, input);
 
-	dy.dynamoose = dynamoose;
-	dy.dynalite;
+	my.dynamoose = dynamoose;
+	my.dynalite;
 
-	dy.settings = {
+	my.settings = {
 		createMany: {
 			threads: 1,
 			batchSize: 100,
+		},
+		aws: {
+			accessKeyId: 'AKID',
+			secretAccessKey: 'SECRET',
+			region: 'us-east-1',
 		},
 		dynalite: {
 			enabled: true,
@@ -33,10 +38,9 @@ function Dynamoosey() {
 			updateTableMs: 500,
 			maxItemSizeKb: 400,
 		},
-		aws: {
-			accessKeyId: 'AKID',
-			secretAccessKey: 'SECRET',
-			region: 'us-east-1',
+		local: {
+			enabled: false,
+			uri: 'http://localhost:8000',
 		},
 	};
 
@@ -45,65 +49,73 @@ function Dynamoosey() {
 	* Set a single setting by key or merge config
 	* @param {Object|string|array} key Either a single key (dotted string / array notation are supported) or an object to merge into the settings
 	* @param {*} [val] The value to set if key is a path
-	* @returns {Dynamoosey} This Dynamoosey instance
+	* @returns {Moody} This Moody instance
 	*/
-	dy.set = (key, val) => {
+	my.set = (key, val) => {
 		if (_.isPlainObject(key)) {
-			_.merge(dy.settings, key);
+			_.merge(my.settings, key);
 		} else {
-			_.set(dy.settings, key, val);
+			_.set(my.settings, key, val);
 		}
-		return dy;
+		return my;
 	};
 
 
 	/**
 	* Setup a connection to either Dynalite (spawned if needed) or AWS
-	* @returns {Promise <Dynamoosey>} A promise which will resolve with the active Dynamoosey instance when completed
+	* @returns {Promise <Moody>} A promise which will resolve with the active Moody instance when completed
 	*/
-	dy.connect = options => Promise.resolve()
+	my.connect = options => Promise.resolve()
 		.then(()=> {
-			if (dy.settings.dynalite.enabled) {
-				debug('Spawning dynalite service on port', dy.settings.dynalite.port);
-				dy.dynalite = dynalite(dy.settings.dynalite);
+			if (my.settings.dynalite.enabled) {
+				debug('Spawning dynalite service on port', my.settings.dynalite.port);
+				my.dynalite = dynalite(my.settings.dynalite);
 				return new Promise((resolve, reject) => {
-					dy.dynalite.listen(dy.settings.dynalite.port, err => {
+					my.dynalite.listen(my.settings.dynalite.port, err => {
 						if (err) return reject(err);
 						debug('Connected to Dynalite');
 						resolve();
 					});
 				});
+			} else if (my.settings.local.enabled) {
+				debug('Connecting to', my.settings.local.uri);
 			} else {
-				throw new Error('Remote Dyanmoose connections are not yet supported');
+				throw new Error('Unsupported connection method, set one of {dynalite,local}.enabled to true');
 			}
 		})
-		.then(()=> dy.dynamoose.AWS.config.update({
-			...dy.settings.aws,
+		.then(()=> my.dynamoose.AWS.config.update({
+			...my.settings.aws,
 			...options,
 		}))
-		.then(()=> dy.settings.dynalite.enabled && dy.dynamoose.local())
-		.then(()=> dy)
+		.then(()=> {
+			if (my.settings.dynalite.enabled) {
+				return my.dynamoose.local();
+			} else if (my.settings.local.enabled) {
+				return my.dynamoose.local(my.settings.local.uri);
+			}
+		})
+		.then(()=> my)
 
 
 	/**
 	* Terminate outstanding connections and cleanup
 	* @returns {Promise} A promise which will resolve after cleanup
 	*/
-	dy.disconnect = ()=> Promise.resolve()
-		.then(()=> dy.dynalite && dy.dynalite.close())
+	my.disconnect = ()=> Promise.resolve()
+		.then(()=> my.dynalite && my.dynalite.close())
 
 
 	/**
-	* Storage for all Dynamoosey models
+	* Storage for all Moody models
 	* @var {Object}
 	*/
-	dy.models = {}; // Model storage
+	my.models = {}; // Model storage
 
-	dy.schema = (id, schema) => new dy.Model(dy, id, schema);
+	my.schema = (id, schema) => new my.Model(my, id, schema);
 
-	dy.serve = (model, options) => new dy.RestServer(dy.models[model], options);
+	my.serve = (model, options) => new my.RestServer(my.models[model], options);
 
-	return dy;
+	return my;
 };
 
-module.exports = new Dynamoosey();
+module.exports = new Moody();

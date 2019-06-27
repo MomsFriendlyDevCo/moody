@@ -1,42 +1,43 @@
 var _ = require('lodash');
-var dynamoosey = require('..');
+var moody = require('..');
 var expect = require('chai').expect;
 
 describe('Extending', function() {
 
-	var dy;
-	before('setup dynamoosey', ()=> dynamoosey.connect().then(res => dy = res))
-	after('disconnect', ()=> dy.disconnect());
+	var my;
+	before('config', ()=> require('./config'));
+	before('setup moody', ()=> moody.connect().then(res => my = res))
+	after('disconnect', ()=> my.disconnect());
 
-	before('create a base schema', ()=> dy.schema('people', {
+	before('create a base schema', ()=> my.schema('people', {
 		id: {type: 'oid'},
 		firstName: 'string',
 		middleName: 'string',
 		lastName: 'string',
-	}));
+	}, {deleteExisting: true}));
 
-	before('create test documents', ()=> dy.models.people.createMany([
+	before('create test documents', ()=> my.models.people.createMany([
 		{firstName: 'Joe', lastName: 'Random'},
 		{firstName: 'Jane', middleName: 'Oliver', lastName: 'Random'},
 		{firstName: 'John', lastName: 'Random'},
 	]));
 
-	before('add a custom static', ()=> dy.models.people.static('countPeople', ()=>
-		dy.models.people.count()
+	before('add a custom static', ()=> my.models.people.static('countPeople', ()=>
+		my.models.people.count()
 	));
 
 	it('should be able to call a custom static method', ()=>
-		dy.models.people.countPeople()
+		my.models.people.countPeople()
 			.then(res => expect(res).to.equal(3))
 	);
 
-	before('add a custom method', ()=> dy.models.people.method('getName', function() {
+	before('add a custom method', ()=> my.models.people.method('getName', function() {
 		// Force this method to act like a promise
 		return Promise.resolve([this.firstName, this.middleName, this.lastName].filter(i => i).join(' '));
 	}));
 
 	it('should be able to call a custom document method', ()=>
-		dy.models.people.find()
+		my.models.people.find()
 			.then(people => Promise.all(people.map(p =>
 				p.getName()
 					.then(fullName => p.fullName = fullName)
@@ -55,7 +56,7 @@ describe('Extending', function() {
 			})
 	);
 
-	before('add a custom virtual', ()=> dy.models.people.virtual('intitals', function() {
+	before('add a custom virtual', ()=> my.models.people.virtual('intitals', function() {
 		return [this.firstName, this.middleName, this.lastName]
 			.filter(i => i)
 			.map(i => i.substr(0, 1))
@@ -63,7 +64,7 @@ describe('Extending', function() {
 	}));
 
 	it('should add a virtual getter', ()=>
-		dy.models.people.find()
+		my.models.people.find()
 			.then(people => {
 				expect(people).to.be.an('array');
 				expect(people).to.have.length(3);

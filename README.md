@@ -1,6 +1,10 @@
-@MomsFriendlyDevCo/Dynamoosey
-=============================
-Thin wrapper around Dynamoose, providing some additional functionality and bringing the API closer to standard [Mongoose](https://mongoosejs.com).
+@MomsFriendlyDevCo/Moody
+========================
+aka. **MOngoose On DYnamo**
+
+Make AWS Dynamo act more like Mongoose.
+
+Wrapper around AWS Dynamo, bringing the API closer to [Mongoose](https://mongoosejs.com).
 
 
 **Features**:
@@ -18,12 +22,12 @@ Thin wrapper around Dynamoose, providing some additional functionality and bring
 
 
 ```javascript
-var dy = require('@momsfriendlydevco/dynamoosey');
-await dy.connect(); // By default uses Dynalite so no config needed for minimal tests
+var my = require('@momsfriendlydevco/moody');
+await my.connect(); // By default uses Dynalite so no config needed for minimal tests
 
 
 // Declare a schema which to validate against
-dy.schema('widgets', { 
+my.schema('widgets', { 
 	id: {type: 'oid'},
 	title: {type: 'string', required: true},
 	color: {type: 'string'},
@@ -31,18 +35,18 @@ dy.schema('widgets', {
 
 
 // Make a new widget
-var myWidget = await dy.models.widgets.create({ 
+var myWidget = await my.models.widgets.create({ 
 	title: 'Foo',
 	color: 'red',
 });
 
 
 // Update the widget by its primary key
-await dy.models.widgets.updateOneByID(myWidget.id, {color: 'purple'});
+await my.models.widgets.updateOneByID(myWidget.id, {color: 'purple'});
 
 
 // Delete it
-await dy.models.widgets.deleteOneByID(myWidget.id);
+await my.models.widgets.deleteOneByID(myWidget.id);
 ```
 
 
@@ -63,7 +67,7 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 * [ ] query.skip is not honored during a query
 * [ ] query.sort is not honored during a query
 * [ ] Deep schema validation
-* [ ] dy.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
+* [ ] my.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
 	- [ ] Testkit: Reject unknown fields
 * [ ] Scan warnings
 * [ ] `model.updateMany()`, `model.deleteMany()` could be improved by using better logic to reuse indexes rather than doing a query to fetch the ID's then acting on those
@@ -71,32 +75,32 @@ await dy.models.widgets.deleteOneByID(myWidget.id);
 
 Debugging
 =========
-This module uses the [debug NPM module](https://github.com/visionmedia/debug) for debugging. To enable set the environment variable to `DEBUG=dynamoosey` or `DEBUG=dynamoosey*` for detail.
+This module uses the [debug NPM module](https://github.com/visionmedia/debug) for debugging. To enable set the environment variable to `DEBUG=moody` or `DEBUG=moody*` for detail.
 
 For example:
 
 ```
-DEBUG=dynamoosey node myFile.js
+DEBUG=moody node myFile.js
 ```
 
-If you want detailed module information (like what exact functions are calling queued), set `DEBUG=dynamoosey:detail`.
+If you want detailed module information (like what exact functions are calling queued), set `DEBUG=moody:detail`.
 
 
 API
 ===
 
-dynamoosey
+moody
 ----------
-Main instance of the Dynamoosey database driver.
+Main instance of the Moody database driver.
 
 
-dynamoosey.dynamoose
---------------------
+moomy.dynamoose
+---------------
 Dynamoose instance.
 
 
-dynamoosey.settings
--------------------
+moomy.settings
+--------------
 Storage for global settings.
 
 | Setting                  | Type    | Default     | Description                                           |
@@ -116,38 +120,38 @@ Storage for global settings.
 | `aws`                    | Object  | See code    | AWS configuration settings                            |
 
 
-dynamoosey.models
------------------
-Object for all loadded models. These can be set with `dynamoosey.set()`.
+moomy.models
+------------
+Object for all loadded models. These can be set with `moomy.set()`.
 
 
-dynamoosey.set(key, val)
-------------------------
+moomy.set(key, val)
+-------------------
 Set a single setting by key or merge config.
-If an object is passed the entire object is merged with the `dynamoosey.settings` object.
+If an object is passed the entire object is merged with the `moomy.settings` object.
 
 
-dynamoosey.connect(options)
----------------------------
+moomy.connect(options)
+----------------------
 Connect to AWS or spawn a Dynalite instance.
 Returns a promise.
 
 
-dynamoosey.disconnect()
------------------------
+moomy.disconnect()
+------------------
 Disconnect from AWS or close a Dynalite instance.
 Returns a promise.
 
 
-dynamoosey.schema(id, schema)
------------------------------
-Declare a model schema. All models are automatically available via `dynamoosey.models`.
+moomy.schema(id, schema, options)
+---------------------------------
+Declare a model schema. All models are automatically available via `moomy.models`.
 
 Each schema entry has the following properties:
 
 | Name           | Type                | Default | Description                                                                                                                                                                                                                                                                                             |
 | `index`        | Boolean / String    | `false` | Specifies indexing, values are (`primary` - use as primary entry, `sort` - use as "range key", `true` - use as a secondary index and `false` - disable indexing)                                                                                                                                        |
-| `type`         | * / String / Object |         | Specify the type of the field, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `dy.addType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema). |
+| `type`         | * / String / Object |         | Specify the type of the field, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `my.addType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema). |
 | `default`      | *                   |         | Specify the default value to use when creating a new document                                                                                                                                                                                                                                           |
 | `required`     | Boolean             | `false` | Check that the field has a value before saving, null and undefined are not accepted                                                                                                                                                                                                                     |
 | `trim`         | Boolean             | `false` | With strings, remove all surrounding whitespace
@@ -161,9 +165,11 @@ Each schema entry has the following properties:
 | `toDynamo`     | Function            |         | Function to transform the entire field into a Dynamo response                                                                                                                                                                                                                                           |
 | `fromDynamo`   | Function            |         | Inverse of `toDynamo`                                                                                                                                                                                                                                                                                   |
 
+See [model](#model) for available model options.
 
-dynamoosey.serve(model, options)
---------------------------------
+
+moomy.serve(model, options)
+---------------------------
 Return an Express middleware layer for a model.
 
 
@@ -211,16 +217,19 @@ module.exports = {
 
 model
 -----
-A Dynamoosey model which was registered via `dynamoosey.schema(id, schema)`.
+A Moody model which was registered via `moomy.schema(id, schema)`.
+Note that this constructor actually returns a Promise which will resolve to the created model when complete.
+
 
 model.settings
 --------------
 Internal model settings.
 
 
-| Name      | Type   | Default | Description                  |
-|-----------|--------|---------|------------------------------|
-| `idField` | String | `id`    | The primary key of the model |
+| Name             | Type    | Default | Description                  |
+|------------------|---------|---------|------------------------------|
+| `idField`        | String  | `id`    | The primary key of the model |
+| `deleteExisting` | Boolean | `false` | Erase any existing table, along with its data, before attempting to create a new one |
 
 
 model.create(doc, options)
@@ -309,9 +318,9 @@ Extend a DynamooseModel to include the named function. This is really just an ea
 
 ```javascript
 // Create another way of counting users
-dy.models.users.static('countUsers', ()=> dy.model.users.count());
+my.models.users.static('countUsers', ()=> my.model.users.count());
 
-dy.models.users.countUsers(); //= {Promise <Number>}
+my.models.users.countUsers(); //= {Promise <Number>}
 ```
 
 
@@ -321,11 +330,11 @@ Extend a DynamooseDocument to include the named function. This function is effec
 
 ```javascript
 // Set the users status to invalid via a method
-dy.model.users.method('setInvalid', function() {
+my.model.users.method('setInvalid', function() {
 	this.status = 'invalid';
 });
 
-dy.models.users.findOne({username: 'bad@user.com'})
+my.models.users.findOne({username: 'bad@user.com'})
 	.then(user => user.setInvalid())
 ```
 

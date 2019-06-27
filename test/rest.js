@@ -1,6 +1,6 @@
 var axios = require('axios');
 var bodyParser = require('body-parser');
-var dynamoosey = require('..');
+var moody = require('..');
 var expect = require('chai').expect;
 var express = require('express');
 var expressLogger = require('express-log-url');
@@ -13,16 +13,12 @@ var dy;
 describe('ReST server', function() {
 	this.timeout(5 * 1000);
 
-	var dy;
-	before('setup dynamoosey', ()=>
-		dynamoosey
-			.set('dynalite.path', `${os.tmpdir()}/dynamoosey-testkit.db`)
-			.connect()
-			.then(res => dy = res)
-	)
-	after('disconnect', ()=> dy.disconnect());
+	var my;
+	before('config', ()=> require('./config'));
+	before('setup moody', ()=> moody.connect().then(res => my = res));
+	after('disconnect', ()=> my.disconnect());
 
-	before('create a movies schema', ()=> dy.schema('movies', {
+	before('create a movies schema', ()=> my.schema('movies', {
 		id: {type: 'oid'},
 		title: {type: 'string', required: true},
 		year: {type: 'number', required: true},
@@ -36,8 +32,9 @@ describe('ReST server', function() {
 			running_time_secs: 'number',
 			actors: ['string'],
 		},
-	}));
-	before('load movie data', ()=> dy.models.movies.loadData(`${__dirname}/data/movies.json`));
+	}, {deleteExisting: true}));
+
+	before('load movie data', ()=> my.models.movies.loadData(`${__dirname}/data/movies.json`));
 
 	var server;
 	before('setup a server', function(finish) {
@@ -45,7 +42,7 @@ describe('ReST server', function() {
 		app.use(expressLogger);
 		app.use(bodyParser.json());
 		app.set('log.indent', '      ');
-		app.use('/api/movies/:id?', dy.models.movies.serve({
+		app.use('/api/movies/:id?', my.models.movies.serve({
 			create: true,
 			get: true,
 			query: true,
@@ -61,7 +58,7 @@ describe('ReST server', function() {
 	var newMovie;
 	it('should create a new movie', ()=>
 		axios.post(`${url}/api/movies`, {
-			title: 'Dynamoosey: Electric Boogaloo',
+			title: 'Moody: Electric Boogaloo',
 			year: 2119,
 			info: {
 				directors: ['Alan Smithee'],
@@ -72,7 +69,7 @@ describe('ReST server', function() {
 				newMovie = res.data;
 				expect(res.data).to.be.an('object');
 				expect(res.data).to.have.property('id');
-				expect(res.data).to.have.property('title', 'Dynamoosey: Electric Boogaloo');
+				expect(res.data).to.have.property('title', 'Moody: Electric Boogaloo');
 				expect(res.data).to.have.property('year', 2119);
 				expect(res.data).to.have.property('info');
 				expect(res.data.info).to.deep.equal({
@@ -88,8 +85,9 @@ describe('ReST server', function() {
 		axios.get(`${url}/api/movies/${newMovie.id}`)
 			.then(res => {
 				expect(res.data).to.be.an('object');
+				console.log('GOT RAW', res.data);
 				expect(res.data).to.have.property('id');
-				expect(res.data).to.have.property('title', 'Dynamoosey: Electric Boogaloo');
+				expect(res.data).to.have.property('title', 'Moody: Electric Boogaloo');
 			})
 	);
 	// }}}
@@ -100,7 +98,7 @@ describe('ReST server', function() {
 			.then(res => {
 				expect(res.data).to.be.an('object');
 				expect(res.data).to.have.property('id');
-				expect(res.data).to.have.property('title', 'Dynamoosey: Electric Boogaloo');
+				expect(res.data).to.have.property('title', 'Moody: Electric Boogaloo');
 				expect(res.data).to.have.nested.property('info.genres');
 				expect(res.data.info.genres).to.be.deep.equal(['Action', 'Adventure', 'Debugging']);
 			})
