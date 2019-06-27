@@ -339,6 +339,26 @@ my.models.users.findOne({username: 'bad@user.com'})
 ```
 
 
+model.createTable()
+-------------------
+Create the table.
+This function is called automatically with the constructor.
+Returns a promise.
+
+
+model.dropTable(options)
+------------------------
+Drop the table from the database.
+This function is called automatically with the constructor if `{settings.deleteExisting: true}`.
+Returns a promise.
+
+Options are:
+
+| Option           | Type      | Default | Description                                        |
+|------------------|-----------|---------|----------------------------------------------------|
+| `ignoreNotExist` | `boolean` | `true`  | Ignore errors that the table doesn't already exist |
+
+
 
 query
 -----

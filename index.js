@@ -111,7 +111,7 @@ function Moody() {
 	*/
 	my.models = {}; // Model storage
 
-	my.schema = (id, schema) => new my.Model(my, id, schema);
+	my.schema = (id, schema, options) => new my.Model(my, id, schema, options);
 
 	my.serve = (model, options) => new my.RestServer(my.models[model], options);
 
