@@ -2,7 +2,9 @@ var _ = require('lodash');
 var debug = require('debug')('moody');
 var dynalite = require('dynalite');
 var dynamoose = require('dynamoose');
+var eventer = require('@momsfriendlydevco/eventer');
 var promisify = require('util').promisify;
+var uuid = require('uuid/v4');
 
 function Moody() {
 	var my = this;
@@ -10,23 +12,23 @@ function Moody() {
 	my.Document = require('./lib/document');
 	my.Model = require('./lib/model');
 	my.Query = require('./lib/query');
-	my.oids = require('./lib/oids');
 	my.RestServer = require('./lib/rest');
 	my.utils = require('./lib/utils');
 	my.scenario = input => require('./lib/scenario')(my, input);
+	my.types = require('./lib/types');
 
 	my.dynamoose = dynamoose;
 	my.dynalite;
 
 	my.settings = {
-		createMany: {
-			threads: 1,
-			batchSize: 100,
-		},
 		aws: {
 			accessKeyId: 'AKID',
 			secretAccessKey: 'SECRET',
 			region: 'us-east-1',
+		},
+		createMany: {
+			threads: 1,
+			batchSize: 100,
 		},
 		dynalite: {
 			enabled: true,
@@ -38,9 +40,14 @@ function Moody() {
 			updateTableMs: 500,
 			maxItemSizeKb: 400,
 		},
+		extraTypes: true,
 		local: {
 			enabled: false,
 			uri: 'http://localhost:8000',
+		},
+		indexes: {
+			forceScan: false,
+			scanWarning: false,
 		},
 	};
 
@@ -105,6 +112,20 @@ function Moody() {
 		.then(()=> my.dynalite && my.dynalite.close())
 
 
+
+	/**
+	* Define (or overwrite) a schema type
+	* @param {string} name The name of the type to declare
+	* @param {function|Object} def Either a function which mutates the node (called as `(node, moody)`) or an object to assign to the node
+	* @returns {Moody} This chainable instance
+	*/
+	my.schemaType = (id, def) => {
+		if (!_.isFunction(def) && !_.isPlainObject(def)) throw new Error('Only functions and plain objects are allowed as schema type definitions');
+		my.types.definitions[id] = def;
+		return my;
+	};
+
+
 	/**
 	* Storage for all Moody models
 	* @var {Object}
@@ -114,6 +135,21 @@ function Moody() {
 	my.schema = (id, schema, options) => new my.Model(my, id, schema, options);
 
 	my.serve = (model, options) => new my.RestServer(my.models[model], options);
+
+
+	if (my.settings.extraTypes) {
+		my.schemaType('pointer', {
+			type: 'string',
+			validate: input => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(input),
+		})
+		my.schemaType('oid', {
+			type: 'string',
+			default: ()=> uuid(),
+			validate: input => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(input),
+		})
+	};
+
+	eventer.extend(my);
 
 	return my;
 };

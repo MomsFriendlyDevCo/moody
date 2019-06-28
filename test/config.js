@@ -1,6 +1,11 @@
 var moody = require('..');
 
 moody.set({
+	// FIXME: Temporary fix until native querying is supported
+	indexes: {
+		forceScan: true,
+	},
+
 	// If using AWS Dynamo local
 	local: {
 		enabled: true,

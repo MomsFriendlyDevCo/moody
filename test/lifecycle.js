@@ -16,8 +16,6 @@ describe('Document lifecycle', function() {
 		color: {type: 'string'},
 	}, {deleteExisting: true}));
 
-	it('should clear the documents in the schema', ()=> my.models.widgets.deleteMany());
-
 	it('should have registered the model globally', ()=> {
 		expect(my.models).to.have.property('widgets');
 		expect(my.models.widgets).to.be.an.instanceOf(my.Model);
@@ -33,7 +31,7 @@ describe('Document lifecycle', function() {
 			expect(doc).to.be.an('object');
 			expect(doc).to.have.property('title', 'Foo');
 			expect(doc).to.have.property('id');
-			expect(doc.id).to.satisfy(my.oids.isOid);
+			expect(doc.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 			createdFoo = _.toPlainObject(doc);
 		})
 	);
@@ -52,7 +50,7 @@ describe('Document lifecycle', function() {
 				expect(doc).to.be.an('object');
 				expect(doc).to.have.property('title');
 				expect(doc).to.have.property('id');
-				expect(doc.id).to.satisfy(my.oids.isOid);
+				expect(doc.id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 			});
 		})
 	);

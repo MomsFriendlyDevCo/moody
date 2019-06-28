@@ -105,6 +105,7 @@ Storage for global settings.
 
 | Setting                  | Type    | Default     | Description                                           |
 |--------------------------|---------|-------------|-------------------------------------------------------|
+| `aws`                    | Object  | See code    | AWS configuration settings                            |
 | `createMany`             | Object  | See below   | Settings which change the behaviour of `createMany()` |
 | `createMany.threads`     | Number  | `1`         | How many parallel threads should be allowed           |
 | `createMany.batchSize`   | Number  | `100`       | How many documents per batch                          |
@@ -117,7 +118,13 @@ Storage for global settings.
 | `dynalite.deleteTableMs` | Number  | `500`       | See Dynalite documentation                            |
 | `dynalite.updateTableMs` | Number  | `500`       | See Dynalite documentation                            |
 | `dynalite.maxItemSizeKb` | Number  | `400`       | See Dynalite documentation                            |
-| `aws`                    | Object  | See code    | AWS configuration settings                            |
+| `extraTypes`             | Boolean | `true`      | Include `oid` and `pointer` default types within schemas |
+| `indexes`                | Object  | See below   | Settings which change how indexes are used            |
+| `indexes.forceScan`      | Boolean | `false`     | Force using the scan method rather than attempting to match to an index |
+| `indexes.scanWarning`    | Boolean | `false`     | Output a warning to a console whenever the scan method is used |
+| `local`                  | Object  | See below   | Settings which change how local Dyanmo servers behave |
+| `local.enabled`          | Boolean | `false`     | Whether to use a local server                         |
+| `local.uri`              | String  | `'http://localhost:8000'` | Local server URI to connect to          |
 
 
 moomy.models
@@ -219,6 +226,10 @@ model
 -----
 A Moody model which was registered via `moomy.schema(id, schema)`.
 Note that this constructor actually returns a Promise which will resolve to the created model when complete.
+
+**Events**:
+
+* **queryScan** - Emitted as `(queryData)` when falling back to using scans
 
 
 model.settings
