@@ -8,12 +8,12 @@ moody.set({
 
 	// If using AWS Dynamo local
 	local: {
-		enabled: true,
+		enabled: false,
 		uri: 'http://localhost:8000',
 	},
 
 	// Fallback if you have nothing else available
 	dynalite: {
-		enabled: false,
+		enabled: true,
 	},
 });
