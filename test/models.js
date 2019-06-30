@@ -2,7 +2,7 @@ var _ = require('lodash');
 var moody = require('..');
 var expect = require('chai').expect;
 
-describe('Extending', function() {
+describe('Models', function() {
 
 	var my;
 	before('config', ()=> require('./config'));
@@ -56,7 +56,7 @@ describe('Extending', function() {
 			})
 	);
 
-	before('add a custom virtual', ()=> my.models.people.virtual('intitals', function() {
+	before('add a custom virtual', ()=> my.models.people.virtual('initials', function() {
 		return [this.firstName, this.middleName, this.lastName]
 			.filter(i => i)
 			.map(i => i.substr(0, 1))

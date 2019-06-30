@@ -350,6 +350,15 @@ my.models.users.findOne({username: 'bad@user.com'})
 ```
 
 
+model.virtual(name, getter, setter)
+-----------------------------------
+Define a virtual field which acts like a getter / setter when accessed.
+
+```javascript
+my.model.users.virtual('fullName', function() { return this.firstName + ' ' + this.lastName });
+```
+
+
 model.createTable()
 -------------------
 Create the table.
