@@ -94,12 +94,12 @@ moody
 Main instance of the Moody database driver.
 
 
-moomy.dynamoose
+moody.dynamoose
 ---------------
 Dynamoose instance.
 
 
-moomy.settings
+moody.settings
 --------------
 Storage for global settings.
 
@@ -127,32 +127,32 @@ Storage for global settings.
 | `local.uri`              | String  | `'http://localhost:8000'` | Local server URI to connect to          |
 
 
-moomy.models
+moody.models
 ------------
-Object for all loadded models. These can be set with `moomy.set()`.
+Object for all loadded models. These can be set with `moody.set()`.
 
 
-moomy.set(key, val)
+moody.set(key, val)
 -------------------
 Set a single setting by key or merge config.
-If an object is passed the entire object is merged with the `moomy.settings` object.
+If an object is passed the entire object is merged with the `moody.settings` object.
 
 
-moomy.connect(options)
+moody.connect(options)
 ----------------------
 Connect to AWS or spawn a Dynalite instance.
 Returns a promise.
 
 
-moomy.disconnect()
+moody.disconnect()
 ------------------
 Disconnect from AWS or close a Dynalite instance.
 Returns a promise.
 
 
-moomy.schema(id, schema, options)
+moody.schema(id, schema, options)
 ---------------------------------
-Declare a model schema. All models are automatically available via `moomy.models`.
+Declare a model schema. All models are automatically available via `moody.models`.
 
 Each schema entry has the following properties:
 
@@ -175,7 +175,14 @@ Each schema entry has the following properties:
 See [model](#model) for available model options.
 
 
-moomy.serve(model, options)
+moody.schemaType(id, definition)
+--------------------------------
+Declare a custom schema type.
+If supplied with an object it is used as the default specification of a single schema item (i.e. doesn't overwrite existing fields).
+If a function is supplied it is called as `(schemaNode, model, moody)` and expected to mutate the schemaNode in place.
+
+
+moody.serve(model, options)
 ---------------------------
 Return an Express middleware layer for a model.
 
@@ -224,7 +231,7 @@ module.exports = {
 
 model
 -----
-A Moody model which was registered via `moomy.schema(id, schema)`.
+A Moody model which was registered via `moody.schema(id, schema)`.
 Note that this constructor actually returns a Promise which will resolve to the created model when complete.
 
 **Events**:
