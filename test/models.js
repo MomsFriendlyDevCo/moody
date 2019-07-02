@@ -59,8 +59,8 @@ describe('Models', function() {
 	before('add a custom virtual', ()=> my.models.people.virtual('initials', function() {
 		return [this.firstName, this.middleName, this.lastName]
 			.filter(i => i)
-			.map(i => i.substr(0, 1))
-			.join('. ');
+			.map(i => i.substr(0, 1).toUpperCase())
+			.join('');
 	}));
 
 	it('should add a virtual getter', ()=>
@@ -71,6 +71,19 @@ describe('Models', function() {
 				people.forEach(person => {
 					expect(person).to.have.property('initials');
 					expect(person.initials).to.be.a('string');
+					expect(person.initials).to.have.length.above(1);
+				});
+			})
+	);
+
+	it('should retrive the virtual getting during a select', ()=>
+		my.models.people.find()
+			.select('initials')
+			.then(people => {
+				expect(people).to.be.an('array');
+				expect(people).to.have.length(3);
+				people.forEach(person => {
+					expect(Object.keys(person).sort()).to.deep.equal(['id', 'initials']);
 					expect(person.initials).to.have.length.above(1);
 				});
 			})
