@@ -200,8 +200,8 @@ app.use('/api/widgets', dynamoose.serve('widgets', {
 ```
 
 
-dynamoose.scenario(input)
--------------------------
+dynamoose.scenario(input, options)
+----------------------------------
 Accept a glob of files (can be an array) and import them. JSON and JS files (with an export) are accepted.
 The meta field `$` is used to reference fields, with any value starting with `$` getting that fields value.
 
@@ -227,6 +227,15 @@ module.exports = {
 	],
 };
 ```
+
+
+Options are:
+
+| Option     | Type       | Default | Description                                                                           |
+|------------|------------|---------|---------------------------------------------------------------------------------------|
+| `postRead` | `function` | `v=>v`  | A (promisable) function which can mutate the combined object schema before processing |
+| `nuke`     | `boolean`  | `false` | Remove + recreate each table in the final schema before processing                    |
+
 
 
 model
