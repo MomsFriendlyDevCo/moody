@@ -3,8 +3,6 @@ var debug = require('debug')('moody');
 var dynalite = require('dynalite');
 var dynamoose = require('dynamoose');
 var eventer = require('@momsfriendlydevco/eventer');
-var promisify = require('util').promisify;
-var uuid = require('uuid/v4');
 
 function Moody() {
 	var my = this;
@@ -137,17 +135,7 @@ function Moody() {
 	my.serve = (model, options) => new my.RestServer(my.models[model], options);
 
 
-	if (my.settings.extraTypes) {
-		my.schemaType('pointer', {
-			type: 'string',
-			validate: input => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(input),
-		})
-		my.schemaType('oid', {
-			type: 'string',
-			default: ()=> uuid(),
-			validate: input => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(input),
-		})
-	};
+	if (my.settings.extraTypes) require('./lib/defaultTypes')(my);
 
 	eventer.extend(my);
 
