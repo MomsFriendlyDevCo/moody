@@ -235,6 +235,7 @@ Options are:
 |--------------|------------|---------|---------------------------------------------------------------------------------------|
 | `postCreate` | `function` |         | Function to run whenever a document is created, called as `(modelId, count)`          |
 | `postRead`   | `function` | `v=>v`  | A (promisable) function which can mutate the combined object schema before processing |
+| `postStats`  | `function` |         | Called when all processing has finished with a stats object for how many of each record were created |
 | `nuke`       | `boolean`  | `false` | Remove + recreate each table in the final schema before processing                    |
 | `therads`    | `number`   | `3`     | How many documents to attempt to create at once                                       |
 
