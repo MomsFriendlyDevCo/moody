@@ -299,6 +299,7 @@ model.updateOneByID(query, patch)
 ---------------------------------
 Update a document by its ID.
 Returns a promise.
+Note that this update methods patches directly to the Dyanmo instance and does NOT process virtuals or `value` attributes. If you want this behaviour use `query.findOneByID(id).update(patch)` instead.
 
 
 model.updateOne(query, patch)
@@ -372,6 +373,8 @@ my.models.users.findOne({username: 'bad@user.com'})
 model.virtual(name, getter, setter)
 -----------------------------------
 Define a virtual field which acts like a getter / setter when accessed.
+All virtual methods are called as `(doc)` and expected to return a value which is assigned to their field.
+
 
 ```javascript
 my.model.users.virtual('fullName', function() { return this.firstName + ' ' + this.lastName });
@@ -443,6 +446,17 @@ Return only the first match from a query as an object - rather than a collection
 query.lean()
 ------------
 Do not decorate the found documents with the model prototype - this skips the prototype methods being added.
+
+
+query.delete()
+--------------
+Perform the query and remove all matching documents.
+
+
+query.update(fields)
+--------------------
+Perform the query and update all matching documents with the specified `fields`.
+Note that if `lean` is enabled virtuals and fields with the `value` attribute cannot be processed also.
 
 
 query.exec()
