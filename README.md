@@ -231,10 +231,12 @@ module.exports = {
 
 Options are:
 
-| Option     | Type       | Default | Description                                                                           |
-|------------|------------|---------|---------------------------------------------------------------------------------------|
-| `postRead` | `function` | `v=>v`  | A (promisable) function which can mutate the combined object schema before processing |
-| `nuke`     | `boolean`  | `false` | Remove + recreate each table in the final schema before processing                    |
+| Option       | Type       | Default | Description                                                                           |
+|--------------|------------|---------|---------------------------------------------------------------------------------------|
+| `postCreate` | `function` |         | Function to run whenever a document is created, called as `(modelId, count)`          |
+| `postRead`   | `function` | `v=>v`  | A (promisable) function which can mutate the combined object schema before processing |
+| `nuke`       | `boolean`  | `false` | Remove + recreate each table in the final schema before processing                    |
+| `therads`    | `number`   | `3`     | How many documents to attempt to create at once                                       |
 
 
 
