@@ -9,19 +9,25 @@ describe('Models', function() {
 	before('setup moody', ()=> moody.connect().then(res => my = res))
 	after('disconnect', ()=> my.disconnect());
 
+	var callCount = 0;
 	before('create a base schema', ()=> my.schema('people', {
 		id: {type: 'oid', index: 'primary'},
 		firstName: 'string',
 		middleName: 'string',
 		lastName: {type: 'string'},
-		edited: {type: 'number', value: doc => new Promise(resolve => setTimeout(()=> resolve(Date.now()), 100))}, // Set edited to a Unix Epoch (+3 ms precision because its JavaScript)
+		edited: { // Set edited to a Unix Epoch (+3 ms precision because its JavaScript)
+			type: 'number',
+			value: doc => new Promise(resolve => setTimeout(()=>
+				resolve(Date.now() + callCount++) // Falsify the date slightly so its always incrementing, just in case we have a very fast response from the server
+			, 100)),
+		},
 	}, {deleteExisting: true}));
 
 	before('create test documents', ()=> my.models.people.createMany([
 		{firstName: 'Joe', lastName: 'Nothing'},
 		{firstName: 'Jane', middleName: 'Oliver', lastName: 'Random'},
 		{firstName: 'John', lastName: 'Random'},
-	]));
+	], {lean: true}));
 
 	before('add a custom static', ()=> my.models.people.static('countPeople', ()=>
 		my.models.people.count()

@@ -24,9 +24,12 @@ function Moody() {
 			secretAccessKey: 'SECRET',
 			region: 'us-east-1',
 		},
-		createMany: {
+		createBatch: {
 			threads: 1,
 			batchSize: 100,
+		},
+		createMany: {
+			threads: 1,
 		},
 		dynalite: {
 			enabled: true,
