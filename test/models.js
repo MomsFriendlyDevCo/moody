@@ -14,7 +14,7 @@ describe('Models', function() {
 		firstName: 'string',
 		middleName: 'string',
 		lastName: {type: 'string'},
-		edited: {type: 'number', value: doc => Date.now()}, // Set edited to a Unix Epoch (+3 ms precision because its JavaScript)
+		edited: {type: 'number', value: doc => new Promise(resolve => setTimeout(()=> resolve(Date.now()), 100))}, // Set edited to a Unix Epoch (+3 ms precision because its JavaScript)
 	}, {deleteExisting: true}));
 
 	before('create test documents', ()=> my.models.people.createMany([
@@ -95,18 +95,24 @@ describe('Models', function() {
 
 		return my.models.people.find()
 			.then(people => {
-				firstPeopleSet = people;
 				expect(people).to.be.an('array');
 				expect(people).to.have.length(3);
 				people.forEach(person => {
-					// Edited is not a default() property so it shouldn't exist until first write
-					expect(person).to.not.have.property('edited');
+					// Edited should not have been set as we have not written this object before
+					expect(person).not.to.have.property('edited');
+				});
 
-					var rawObject = person.toObject();
-					expect(rawObject).to.satisfy(_.isPlainObject);
+				return people;
+			})
+			.then(people => Promise.all(people.map(person => person.toObject()))) // Flatten back into a plain object
+			.then(people => {
+				firstPeopleSet = people;
+				people.forEach(person => {
+					// Edit should have been set during the `toObject()` phrase
+					expect(person).to.have.property('edited');
 
 					// Remove middleName as it may not bre present, ignore initials because its a virtual
-					expect(Object.keys(rawObject).sort().filter(i => i != 'middleName')).to.deep.equal(['edited', 'firstName', 'id', 'lastName']);
+					expect(Object.keys(person).sort().filter(i => i != 'middleName')).to.deep.equal(['edited', 'firstName', 'id', 'lastName']);
 				});
 				joes.push(people.find(p => p.firstName == 'Joe'));
 			})

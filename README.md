@@ -163,7 +163,7 @@ Each schema entry has the following properties:
 | `type`         | * / String / Object |         | Specify field type, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `my.schemaType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema)          |
 | `default`      | *                   |         | Specify the default value to use when creating a new document                                 |
 | `forceDefault` | Boolean             | `false` | Always force the default value being used on first write, even if a value is specified        |
-| `value`        | Function            |         | Always use the calculated value on each write even if a value is provided, See notes          |
+| `value`        | Function / Promise  |         | Set calculated value on each write even if a value is provided. Called as `(doc, iter)`. See notes |
 | `required`     | Boolean             | `false` | Check that the field has a value before saving, null and undefined are not accepted           |
 | `trim`         | Boolean             | `false` | With strings, remove all surrounding whitespace                                               |
 | `validate`     | Function, RegExp, * |         | Specify a validation function to run when setting the value                                   |
@@ -179,6 +179,7 @@ Each schema entry has the following properties:
 **Notes:**
 
 * The `value` tag is *only processed* when not using `.lean()` in queries. To update an existing document by its ID use `my.MODEL.findOneByID(id).update(patch)` for example and not `my.model.updateOneByID(id, patch)` as the latter updates directly to Dynamo and bypasses Moody's schema system.
+* If present the `value` function is called as `(doc, iter)` where doc is the current document and iter is the iterable context. For example if the value is being set inside an array of 3 items it will be called three times with the doc being the same and iter being all occurances of that value being calculated - each array value
 
 
 See [model](#model) for available model options.
