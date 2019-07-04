@@ -199,10 +199,10 @@ Return an Express middleware layer for a model.
 
 ```javascript
 // Create a simple ReST server of 'users' with default options
-app.use('/api/users', dynamoose.serve('users'))
+app.use('/api/users', moody.serve('users'))
 
 // Create a ReST server where widgets can be created, updated and deleted as well as the default queries
-app.use('/api/widgets', dynamoose.serve('widgets', {
+app.use('/api/widgets', moody.serve('widgets', {
 	create: true,
 	save: true,
 	delete: (req, res, next) => res.send('Are you sure you should be deleting that?'),
@@ -210,7 +210,7 @@ app.use('/api/widgets', dynamoose.serve('widgets', {
 ```
 
 
-dynamoose.scenario(input, options)
+moody.scenario(input, options)
 ----------------------------------
 Accept a glob of files (can be an array) and import them. JSON and JS files (with an export) are accepted.
 The meta field `$` is used to reference fields, with any value starting with `$` getting that fields value.
@@ -350,12 +350,12 @@ Returns a promise.
 
 model.serve(options)
 --------------------
-Shorthand for `dynamoose.serve(id, options)`.
+Shorthand for `moody.serve(id, options)`.
 
 
 model.static(name, func)
 ------------------------
-Extend a DynamooseModel to include the named function. This is really just an easier way of handling mixins with models.
+Extend a MoodyModel to include the named function. This is really just an easier way of handling mixins with models.
 
 ```javascript
 // Create another way of counting users
@@ -367,7 +367,7 @@ my.models.users.countUsers(); //= {Promise <Number>}
 
 model.method(name, func)
 ------------------------
-Extend a DynamooseDocument to include the named function. This function is effecively glued onto and documents returned via `find` (or its brethren).
+Extend a MoodyDocument instance to include the named function. This function is effecively glued onto and documents returned via `find` (or its brethren).
 
 ```javascript
 // Set the users status to invalid via a method
@@ -414,7 +414,7 @@ Options are:
 
 query
 -----
-The Dynamoose query object.
+The Moody query object.
 This is a chainable instance which executes itself when any Promise method is called i.e. `then`, `catch` or `finally.
 
 
@@ -473,3 +473,42 @@ query.exec()
 ------------
 Execute the query and return a promise.
 This is automatically invoked with any promise like function call - `then`, `catch` and `finally`.
+
+
+document
+--------
+The return value of a Moody query.
+
+
+document.$each(path, func)
+--------------------------
+Iterate down a document mapping all matching endpoints.
+With one (dotted notation) path this acts the same as `_.set()` but if any of the nodes are arrays all branching endpoints are mapped via the function.
+Returns a Promise.
+
+
+document.$set(path, value)
+--------------------------
+Set the value of a dotted notation path, evaluating the value if its a promise.
+Note: Unlike `document.$each` this does not resolve relative to the schema path, just the plain object.
+Returns a Promise.
+
+
+document.toObject()
+-------------------
+Convert the curent MoodyDocument to a plain object.
+This will resolve all virtuals and value keys.
+Returns a Promise.
+
+
+document.save(patch)
+--------------------
+Save the current Moody document back to the database.
+Patch is an optional object of fields to merge before saving.
+Returns a Promise.
+
+
+document.delete()
+-----------------
+Delete the current Moody document.
+Returns a Promise.
