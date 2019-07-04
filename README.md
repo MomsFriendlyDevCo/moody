@@ -57,11 +57,12 @@ await my.models.widgets.deleteOneByID(myWidget.id);
 * [x] Testkits
 * [x] ReST server
 * [x] Scenario support
-* [ ] Model.virtual()
+* [x] Model.virtual()
 * [x] Model.method()
 * [x] Model.static()
 * [ ] Model.emit() / Model.on()
 * [x] Model.serve properties: queryForce, queryValidate
+* [x] schemaAttribute.value()
 * [ ] query.select is not honored during a query (A software `_.pick()` call is used internally to simulate for now)
 * [ ] query.limit is not honored during a query
 * [ ] query.skip is not honored during a query
@@ -156,21 +157,29 @@ Declare a model schema. All models are automatically available via `moody.models
 
 Each schema entry has the following properties:
 
-| Name           | Type                | Default | Description                                                                                                                                                                                                                                                                                             |
-| `index`        | Boolean / String    | `false` | Specifies indexing, values are (`primary` - use as primary entry, `sort` - use as "range key", `true` - use as a secondary index and `false` - disable indexing)                                                                                                                                        |
-| `type`         | * / String / Object |         | Specify the type of the field, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `my.schemaType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema). |
-| `default`      | *                   |         | Specify the default value to use when creating a new document                                                                                                                                                                                                                                           |
-| `required`     | Boolean             | `false` | Check that the field has a value before saving, null and undefined are not accepted                                                                                                                                                                                                                     |
-| `trim`         | Boolean             | `false` | With strings, remove all surrounding whitespace
-| `validate`     | Function, RegExp, * |         | Specify a validation function to run when setting the value                                                                                                                                                                                                                                             |
-| `enum`         | Array <String>      |         | Specify valid options with a string                                                                                                                                                                                                                                                                     |
-| `lowercase`    | Boolean             | `false` | Force incoming values to lowercase                                                                                                                                                                                                                                                                      |
-| `uppercase`    | Boolean             | `false` | Force incoming values to UPPERCASE                                                                                                                                                                                                                                                                      |
-| `forceDefault` | Boolean             | `false` | Always force the default value being used on first write, even if a value is specified                                                                                                                                                                                                                  |
-| `set`          | Function            |         | Function to transform the given value before DB write                                                                                                                                                                                                                                                   |
-| `get`          | Function            |         | Function to transform the raw DB value before passing it to the application                                                                                                                                                                                                                             |
-| `toDynamo`     | Function            |         | Function to transform the entire field into a Dynamo response                                                                                                                                                                                                                                           |
-| `fromDynamo`   | Function            |         | Inverse of `toDynamo`                                                                                                                                                                                                                                                                                   |
+| Name           | Type                | Default | Description                                                                                   |
+|----------------|---------------------|---------|-----------------------------------------------------------------------------------------------|
+| `index`        | Boolean / String    | `false` | Specifies indexing. Enum of: `primary` - use as primary entry, `sort` - use as "range key", `true` - use as a secondary index and `false` - disable indexing) |
+| `type`         | * / String / Object |         | Specify field type, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `my.schemaType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema)          |
+| `default`      | *                   |         | Specify the default value to use when creating a new document                                 |
+| `forceDefault` | Boolean             | `false` | Always force the default value being used on first write, even if a value is specified        |
+| `value`        | Function            |         | Always use the calculated value on each write even if a value is provided, See notes          |
+| `required`     | Boolean             | `false` | Check that the field has a value before saving, null and undefined are not accepted           |
+| `trim`         | Boolean             | `false` | With strings, remove all surrounding whitespace                                               |
+| `validate`     | Function, RegExp, * |         | Specify a validation function to run when setting the value                                   |
+| `enum`         | Array <String>      |         | Specify valid options with a string                                                           |
+| `lowercase`    | Boolean             | `false` | Force incoming values to lowercase                                                            |
+| `uppercase`    | Boolean             | `false` | Force incoming values to UPPERCASE                                                            |
+| `set`          | Function            |         | Function to transform the given value before DB write                                         |
+| `get`          | Function            |         | Function to transform the raw DB value before passing it to the application                   |
+| `toDynamo`     | Function            |         | Function to transform the entire field into a Dynamo response                                 |
+| `fromDynamo`   | Function            |         | Inverse of `toDynamo`                                                                         |
+
+
+**Notes:**
+
+* The `value` tag is *only processed* when not using `.lean()` in queries. To update an existing document by its ID use `my.MODEL.findOneByID(id).update(patch)` for example and not `my.model.updateOneByID(id, patch)` as the latter updates directly to Dynamo and bypasses Moody's schema system.
+
 
 See [model](#model) for available model options.
 

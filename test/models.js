@@ -10,14 +10,15 @@ describe('Models', function() {
 	after('disconnect', ()=> my.disconnect());
 
 	before('create a base schema', ()=> my.schema('people', {
-		id: {type: 'oid'},
+		id: {type: 'oid', index: 'primary'},
 		firstName: 'string',
 		middleName: 'string',
-		lastName: 'string',
+		lastName: {type: 'string'},
+		edited: {type: 'number', value: doc => Date.now()}, // Set edited to a Unix Epoch (+3 ms precision because its JavaScript)
 	}, {deleteExisting: true}));
 
 	before('create test documents', ()=> my.models.people.createMany([
-		{firstName: 'Joe', lastName: 'Random'},
+		{firstName: 'Joe', lastName: 'Nothing'},
 		{firstName: 'Jane', middleName: 'Oliver', lastName: 'Random'},
 		{firstName: 'John', lastName: 'Random'},
 	]));
@@ -88,5 +89,47 @@ describe('Models', function() {
 				});
 			})
 	);
+
+	it('should have populated the `edited` value field in each case', ()=> {
+		var joes = []; // All times we have pulled the "joes" record from the DB
+
+		return my.models.people.find()
+			.then(people => {
+				firstPeopleSet = people;
+				expect(people).to.be.an('array');
+				expect(people).to.have.length(3);
+				people.forEach(person => {
+					// Edited is not a default() property so it shouldn't exist until first write
+					expect(person).to.not.have.property('edited');
+
+					var rawObject = person.toObject();
+					expect(rawObject).to.satisfy(_.isPlainObject);
+
+					// Remove middleName as it may not bre present, ignore initials because its a virtual
+					expect(Object.keys(rawObject).sort().filter(i => i != 'middleName')).to.deep.equal(['edited', 'firstName', 'id', 'lastName']);
+				});
+				joes.push(people.find(p => p.firstName == 'Joe'));
+			})
+			.then(()=> my.models.people.findOneByID(joes[0].id).update({firstName: 'Joseph'}))
+			.then(changedPerson => {
+				expect(changedPerson).to.have.property('firstName', 'Joseph');
+				expect(changedPerson).to.have.property('edited');
+				expect(changedPerson.edited).to.be.a('number');
+				joes.push(changedPerson);
+			})
+			.then(()=> my.models.people.findOneByID(joes[0].id).update({firstName: 'Joseph2'})) // Write again to test edited updates
+			.then(changedPerson => {
+				expect(changedPerson).to.have.property('firstName', 'Joseph2');
+				expect(changedPerson).to.have.property('edited');
+				expect(changedPerson.edited).to.be.above(joes[1].edited);
+				joes.push(changedPerson);
+			})
+			.then(()=> my.models.people.findOneByID(joes[0].id)) // Check the data did actually write
+			.then(person => {
+				expect(person).to.have.property('firstName', 'Joseph2');
+				expect(person).to.have.property('edited');
+				expect(person.edited).to.be.equal(joes[2].edited);
+			})
+	});
 
 });
