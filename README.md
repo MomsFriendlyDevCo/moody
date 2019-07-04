@@ -19,6 +19,8 @@ Wrapper around AWS Dynamo, bringing the API closer to [Mongoose](https://mongoos
 * Functionality to quickly load from a file - `model.loadData(path|collection)`
 * Express compatible ReST server out-of-the-box
 * `index` attribute can now take more shorthand values
+* Statics / Methods / Virtuals support
+* The `value` schema field can force a value to be set on each write operation - e.g. `{edited: {type: 'date', value: doc => new Date()}}`
 
 
 ```javascript
