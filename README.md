@@ -20,7 +20,7 @@ Wrapper around AWS Dynamo, bringing the API closer to [Mongoose](https://mongoos
 * Express compatible ReST server out-of-the-box
 * `index` attribute can now take more shorthand values
 * Statics / Methods / Virtuals support
-* The `value` schema field can force a value to be set on each write operation - e.g. `{edited: {type: 'date', value: doc => new Date()}}`
+* The `value` schema field can force a value to be set on each write operation - e.g. `{edited: {type: 'date', value: (doc, iter, docPath, schemaPath) => new Date()}}`
 
 
 ```javascript
@@ -182,7 +182,7 @@ Each schema entry has the following properties:
 **Notes:**
 
 * The `value` tag is *only processed* when not using `.lean()` in queries. To update an existing document by its ID use `my.MODEL.findOneByID(id).update(patch)` for example and not `my.model.updateOneByID(id, patch)` as the latter updates directly to Dynamo and bypasses Moody's schema system.
-* If present the `value` function is called as `(doc, iter)` where doc is the current document and iter is the iterable context. For example if the value is being set inside an array of 3 items it will be called three times with the doc being the same and iter being all occurances of that value being calculated - each array value
+* If present the `value` function is called as `(doc, iter, docPath, schemaPath)` where doc is the current document and iter is the iterable context. For example if the value is being set inside an array of 3 items it will be called three times with the doc being the same and iter being all occurances of that value being calculated - each array value
 
 
 See [model](#model) for available model options.
@@ -485,7 +485,14 @@ The return value of a Moody query.
 
 document.$each(path, func)
 --------------------------
-Iterate down a document mapping all matching endpoints.
+Iterate down a document schema path running a function on all matching endpoints.
+With one (dotted notation) path this acts the same as `_.set()` but if any of the nodes are arrays all branching endpoints are mapped via the function.
+Returns a Promise.
+
+
+document.$eachDocumentNode(path, func)
+--------------------------------------
+Iterate down a document (Note: *not* a schema, use `document.$each()` for that) and set paths.
 With one (dotted notation) path this acts the same as `_.set()` but if any of the nodes are arrays all branching endpoints are mapped via the function.
 Returns a Promise.
 
