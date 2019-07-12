@@ -50,6 +50,12 @@ function Moody() {
 			forceScan: false,
 			scanWarning: false,
 		},
+		query: {
+			soft: {
+				select: false,
+				sort: false,
+			},
+		},
 		serve: {
 		},
 	};
