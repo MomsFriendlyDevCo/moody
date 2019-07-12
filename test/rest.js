@@ -19,7 +19,7 @@ describe('ReST server', function() {
 	after('disconnect', ()=> my.disconnect());
 
 	before('create a movies schema', ()=> my.schema('movies', {
-		id: {type: 'oid'},
+		id: {type: 'oid', index: 'primary'},
 		title: {type: 'string', required: true},
 		year: {type: 'number', required: true},
 		info: {
@@ -81,11 +81,12 @@ describe('ReST server', function() {
 					rank: 17,
 				});
 			})
+			.then(()=> new Promise(resolve => setTimeout(()=> resolve(), 3000)))
 	);
 	// }}}
 
 	// Fetch document (GET + id) {{{
-	it.skip('should get the movie by its ID', ()=>
+	it('should get the movie by its ID', ()=>
 		axios.get(`${url}/api/movies/${newMovie.id}`)
 			.then(res => {
 				expect(res.data).to.be.an('object');
