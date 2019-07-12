@@ -65,10 +65,14 @@ await my.models.widgets.deleteOneByID(myWidget.id);
 * [ ] Model.emit() / Model.on()
 * [x] Model.serve properties: queryForce, queryValidate
 * [x] schemaAttribute.value()
-* [ ] query.select is not honored during a query (A software `_.pick()` call is used internally to simulate for now)
+* [ ] schema{type=array} should default to `[]`
+* [ ] schema{type=map} should default to `{}`
+* [x] query.select (soft, use JS to do the work)
+* [ ] query.select (hard, pass onto Dynamo)
+* [x] query.sort (soft, use JS to do the work)
+* [ ] query.sort (hard, pass onto Dynamo)
 * [ ] query.limit is not honored during a query
 * [ ] query.skip is not honored during a query
-* [ ] query.sort is not honored during a query
 * [ ] Deep schema validation
 * [ ] my.Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
 	- [ ] Testkit: Reject unknown fields
