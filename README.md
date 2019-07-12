@@ -128,6 +128,7 @@ Storage for global settings.
 | `local`                  | Object  | See below   | Settings which change how local Dyanmo servers behave |
 | `local.enabled`          | Boolean | `false`     | Whether to use a local server                         |
 | `local.uri`              | String  | `'http://localhost:8000'` | Local server URI to connect to          |
+| `serve`                  | Object  | See rest    | Defaults to pass to `moody.serve()`                   |
 
 
 moody.models

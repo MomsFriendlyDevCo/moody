@@ -50,6 +50,8 @@ function Moody() {
 			forceScan: false,
 			scanWarning: false,
 		},
+		serve: {
+		},
 	};
 
 
