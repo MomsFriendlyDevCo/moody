@@ -8,6 +8,7 @@ describe('Index access', function() {
 	var my;
 	before('config', ()=> require('./config'));
 	before('setup moody', ()=> moody.connect().then(res => my = res));
+	before('force moody to use hard indexes', ()=> moody.set('indexes.forceScan', false));
 	after('disconnect', ()=> my.disconnect());
 
 	var events = {queryScan: 0, queryPrimary: 0};
