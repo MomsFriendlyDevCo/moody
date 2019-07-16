@@ -3,6 +3,7 @@ var debug = require('debug')('moody');
 var dynalite = require('dynalite');
 var dynamoose = require('dynamoose');
 var eventer = require('@momsfriendlydevco/eventer');
+var timestring = require('timestring');
 
 function Moody() {
 	var my = this;
@@ -23,6 +24,9 @@ function Moody() {
 			accessKeyId: 'AKID',
 			secretAccessKey: 'SECRET',
 			region: 'us-east-1',
+		},
+		cache: {
+			defaultTime: timestring('30s'),
 		},
 		createBatch: {
 			threads: 1,

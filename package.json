@@ -28,6 +28,7 @@
     "dynamoose": "^1.8.0",
     "globby": "^9.2.0",
     "lodash": "^4.17.11",
+    "timestring": "^6.0.0",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
