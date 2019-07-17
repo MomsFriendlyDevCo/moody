@@ -114,6 +114,7 @@ Storage for global settings.
 | Setting                  | Type    | Default     | Description                                           |
 |--------------------------|---------|-------------|-------------------------------------------------------|
 | `aws`                    | Object  | See code    | AWS configuration settings                            |
+| `aws.enabled`            | Boolean | `false`     | Use actual AWS connection                             |
 | `createMany`             | Object  | See below   | Settings which change the behaviour of `createMany()` |
 | `createMany.threads`     | Number  | `1`         | How many parallel threads should be allowed           |
 | `createMany.batchSize`   | Number  | `100`       | How many documents per batch                          |

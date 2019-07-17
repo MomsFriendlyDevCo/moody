@@ -21,6 +21,7 @@ function Moody() {
 
 	my.settings = {
 		aws: {
+			enabled: false,
 			accessKeyId: 'AKID',
 			secretAccessKey: 'SECRET',
 			region: 'us-east-1',
@@ -99,8 +100,10 @@ function Moody() {
 				});
 			} else if (my.settings.local.enabled) {
 				debug('Connecting to', my.settings.local.uri);
+			} else if (my.settings.aws.enabled) {
+				debug('Connecting to AWS region', my.settings.aws.region);
 			} else {
-				throw new Error('Unsupported connection method, set one of {dynalite,local}.enabled to true');
+				throw new Error('Unsupported connection method, set one of {aws,dynalite,local}.enabled to true');
 			}
 		})
 		.then(()=> my.dynamoose.AWS.config.update({
