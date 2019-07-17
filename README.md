@@ -268,6 +268,7 @@ Note that this constructor actually returns a Promise which will resolve to the 
 
 **Events**:
 
+* **query** - Emitted as `(queryData)` when running a query with a valid index
 * **queryScan** - Emitted as `(queryData)` when falling back to using scans
 
 
@@ -477,6 +478,11 @@ query.update(fields)
 --------------------
 Perform the query and update all matching documents with the specified `fields`.
 Note that if `lean` is enabled virtuals and fields with the `value` attribute cannot be processed also.
+
+
+query.using(index)
+------------------
+Force the index used when running the query.
 
 
 query.exec()

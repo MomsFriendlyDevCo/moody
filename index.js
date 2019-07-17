@@ -14,6 +14,7 @@ function Moody() {
 	my.RestServer = require('./lib/rest');
 	my.utils = require('./lib/utils');
 	my.scenario = (input, options) => require('./lib/scenario')(my, input, options);
+	my.translateMongo = require('./lib/translateMongo');
 	my.types = require('./lib/types');
 
 	my.dynamoose = dynamoose;

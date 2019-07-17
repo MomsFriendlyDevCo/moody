@@ -19,9 +19,9 @@ describe('Index access', function() {
 
 	it('should create a schema', ()=> my.schema('widgets', {
 		id: {type: 'oid', index: 'primary'},
-		title: {type: 'string', required: true, index: 'sort'},
-		color: {type: 'string', index: true},
-		sprockets: {type: 'number'},
+		title: {type: 'string', required: true, rangeKey: true},
+		color: {type: 'string', index: {global: true, name: 'filterColorSortTitle'}},
+		sprockets: {type: 'number', index: true},
 	}, {deleteExisting: true}));
 
 	it('should create some test documents', ()=> my.models.widgets.createMany([
@@ -33,14 +33,46 @@ describe('Index access', function() {
 
 	it('should wait', ()=> new Promise(resolve => setTimeout(resolve, 1000)));
 
+	var widgets;
 	it('should warn when using a raw scan method', ()=>
-		my.models.widgets.find({sprockets: 10})
-			.then(()=> expect(events.queryScan).to.equal(1))
+		my.models.widgets.find()
+			.then(res => {
+				widgets = res;
+				expect(events.queryScan).to.equal(1);
+			})
 	);
 
 	it('should use the primary key index', ()=>
-		my.models.widgets.find({id: 'b8e5ad7e-6f84-4335-9d7b-96930e1aa3bd'})
-			.then(()=> expect(events.queryPrimary).to.equal(1))
+		my.models.widgets.find({id: widgets[1].id})
+			.then(res => {
+				expect(res).to.be.an('array');
+				expect(res).to.have.length(1);
+				expect(res[0]).to.have.property('id', widgets[1].id);
+			})
+	);
+
+	it('should use a secondary index (forced)', ()=>
+		my.models.widgets.find({color: 'red'})
+			.using('filterColorSortTitle')
+			.then(res => {
+				expect(res).to.be.an('array');
+				expect(res).to.have.length(2);
+			})
+	);
+
+	it('should use a secondary index (automatic)', ()=>
+		my.models.widgets.find({color: 'blue'})
+			.then(res => {
+				expect(res).to.be.an('array');
+				expect(res).to.have.length(1);
+			})
+	);
+
+	// Not yet supported
+	it.skip('should count with a range', ()=>
+		my.models.widgets.find({
+			sprockets: {$gt: 4},
+		}).then(res => expect(res).to.equal(2))
 	);
 
 });

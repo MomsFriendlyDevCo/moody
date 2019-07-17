@@ -25,7 +25,7 @@
     "@momsfriendlydevco/eventer": "^1.1.5",
     "debug": "^4.1.1",
     "dynalite": "^2.3.1",
-    "dynamoose": "^1.8.0",
+    "dynamoose": "^1.10.0",
     "globby": "^9.2.0",
     "lodash": "^4.17.11",
     "timestring": "^6.0.0",
