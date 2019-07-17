@@ -64,6 +64,12 @@ function Moody() {
 		},
 		serve: {
 		},
+		tables: {
+			create: true,
+			prefix: '',
+			suffix: '',
+			update: false,
+		},
 	};
 
 

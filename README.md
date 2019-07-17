@@ -136,6 +136,11 @@ Storage for global settings.
 | `local.uri`              | String  | `'http://localhost:8000'` | Local server URI to connect to          |
 | `query`                  | Object  | `{}`        | Default properties to populate into a query           |
 | `serve`                  | Object  | `{}`        | Defaults to pass to `moody.serve()`                   |
+| `tables`                 | Object  | `{}`        | Default table options                                 |
+| `tables.create`          | Boolean | `true`      | Create the table if it does not already exist         |
+| `tables.prefix`          | String  | `""`        | Prefix used when naming tables                        |
+| `tables.suffix`          | String  | `""`        | Suffix used when naming tables                        |
+| `tables.update`          | Boolean | `false`     | Update local indexes from remote                      |
 
 
 moody.models
