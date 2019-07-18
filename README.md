@@ -174,7 +174,7 @@ Each schema entry has the following properties:
 
 | Name           | Type                | Default | Description                                                                                   |
 |----------------|---------------------|---------|-----------------------------------------------------------------------------------------------|
-| `index`        | Boolean / String    | `false` | Specifies indexing. Enum of: `primary` - use as primary entry, `sort` - use as "range key", `true` - use as a secondary index and `false` - disable indexing) |
+| `index`        | Boolean / String    | `false` | Specifies indexing (see below for possible values)                                            |
 | `type`         | * / String / Object |         | Specify field type, both JS natives (e.g. `Boolean`, `Number`) and strings (e.g. `'boolean'`, `'number'`) are supported. Additional types can be added via `my.schemaType()`. If an object is given this corresponds with the [Dynamoose index definition](https://dynamoosejs.com/api/schema)          |
 | `default`      | *                   |         | Specify the default value to use when creating a new document                                 |
 | `forceDefault` | Boolean             | `false` | Always force the default value being used on first write, even if a value is specified        |
@@ -193,6 +193,13 @@ Each schema entry has the following properties:
 
 **Notes:**
 
+* The index value can be any of the following extended types:
+	* `'primary'` - use as primary key / parition key / hash key
+	* `'sort'` - use as range key
+	- `true` - use as a secondary index
+	- `false` - disable indexing (implied default)
+	- (A string) - Implied `{global: true, project: true, name: STRING}`
+	- (An object) - passthru to Dynamoose
 * The `value` tag is *only processed* when not using `.lean()` in queries. To update an existing document by its ID use `my.MODEL.findOneByID(id).update(patch)` for example and not `my.model.updateOneByID(id, patch)` as the latter updates directly to Dynamo and bypasses Moody's schema system.
 * If present the `value` function is called as `(doc, iter, docPath, schemaPath)` where doc is the current document and iter is the iterable context. For example if the value is being set inside an array of 3 items it will be called three times with the doc being the same and iter being all occurances of that value being calculated - each array value
 
