@@ -230,6 +230,22 @@ app.use('/api/widgets', moody.serve('widgets', {
 ))
 ```
 
+Available options:
+
+| Field           | Type                       | Default   | Description
+|-----------------|----------------------------|-----------|------------
+| `id`            | String                     | `"id"`    | Where to look in req.params for the document ID to get/update/delete
+| `countToken`    | String                     | `"count"` | Special case to of req.params[options.param] when to count documents rather than query them
+| `get`           | Boolean, Array or Function | `true`    | Enable getting of records or specify middleware(s) to execute beforehand
+| `query`         | Boolean, Array or Function | `true`    | Enable querying of records or specify middleware(s) to execute beforehand
+| `count`         | Boolean, Array or Function | `true`    | Enable counting of records or specify middleware(s) to execute beforehand
+| `create`        | Boolean, Array or Function | `false`   | Enable creating of records or specify middleware(s) to execute beforehand
+| `save`          | Boolean, Array or Function | `save`    | Enable updating of records or specify middleware(s) to execute beforehand
+| `delete`        | Boolean, Array or Function | `false`   | Enable deleting of records or specify middleware(s) to execute beforehand
+| `queryForce`    | Object or Function         |           | Override the incomming req.query object with either a static object or an evaluated promise returns. Called as `(req)`
+| `queryValidate` | Function                   |           | Validate an incomming query, similar to `queryForce`. Throw an error to reject. Called as `(req)`.
+| `errorHandler`  | Function                   |           | How to handle errors, default is to use Expresses `res.status(code).send(text)` method. Called as (res, code, text)
+
 
 moody.scenario(input, options)
 ----------------------------------
