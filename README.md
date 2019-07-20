@@ -69,15 +69,14 @@ await my.models.widgets.deleteOneByID(myWidget.id);
 * [ ] schema{type=map} should default to `{}`
 * [ ] query.cache (prevent duplicate queries and cache results)
 * [x] query.select (soft, use JS to do the work)
-* [ ] query.select (hard, pass onto Dynamo)
+* [x] query.select (hard, pass onto Dynamo)
 * [x] query.sort (soft, use JS to do the work)
 * [ ] query.sort (hard, pass onto Dynamo)
-* [ ] query.limit is not honored during a query
+* [x] query.limit is not honored during a query
 * [ ] query.skip is not honored during a query
-* [ ] Deep schema validation
-* [ ] Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
+* [x] Query.find() needs to reuse indexes instead of doing stupid `scan()` operations every time
 	- [ ] Testkit: Reject unknown fields
-* [ ] Scan warnings
+* [x] Scan warnings
 * [ ] `model.updateMany()`, `model.deleteMany()` could be improved by using better logic to reuse indexes rather than doing a query to fetch the ID's then acting on those
 
 
