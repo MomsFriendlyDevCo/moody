@@ -67,7 +67,7 @@ await my.models.widgets.deleteOneByID(myWidget.id);
 * [x] schemaAttribute.value()
 * [ ] schema{type=array} should default to `[]`
 * [ ] schema{type=map} should default to `{}`
-* [ ] query.cache (prevent duplicate queries and cache results)
+* [ ] query.cache (prevent duplicate queries and cache results, currently just a stub)
 * [x] query.select (soft, use JS to do the work)
 * [x] query.select (hard, pass onto Dynamo)
 * [x] query.sort (soft, use JS to do the work)
@@ -505,6 +505,16 @@ query.update(fields)
 --------------------
 Perform the query and update all matching documents with the specified `fields`.
 Note that if `lean` is enabled virtuals and fields with the `value` attribute cannot be processed also.
+
+
+query.cache(time) / query.cached(time)
+--------------------------------------
+Attempt to locate a duplicate query and attach to its handler if present.
+If not, execute the query holding the result until the expiry. Other cached queries will then use its return until the time expires.
+
+This funciton is intended to reduce the workload on the database when doing trivial fetches.
+
+Time can be any valid [timestring](https://github.com/mike182uk/timestring).
 
 
 query.using(index)
