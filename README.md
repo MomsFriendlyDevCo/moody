@@ -242,6 +242,7 @@ Available options:
 | `create`        | Boolean, Array or Function | `false`   | Enable creating of records or specify middleware(s) to execute beforehand
 | `save`          | Boolean, Array or Function | `save`    | Enable updating of records or specify middleware(s) to execute beforehand
 | `delete`        | Boolean, Array or Function | `false`   | Enable deleting of records or specify middleware(s) to execute beforehand
+| `softQuery`     | Boolean                    | `false`   | Enable soft querying for this interface
 | `queryForce`    | Object or Function         |           | Override the incomming req.query object with either a static object or an evaluated promise returns. Called as `(req)`
 | `queryValidate` | Function                   |           | Validate an incomming query, similar to `queryForce`. Throw an error to reject. Called as `(req)`.
 | `errorHandler`  | Function                   |           | How to handle errors, default is to use Expresses `res.status(code).send(text)` method. Called as (res, code, text)
@@ -464,6 +465,11 @@ Merge the internal query to execute with the provided one.
 query.count()
 -------------
 Transform the query output into a count of documents rather than the document itself.
+
+
+query.sift(filters...)
+----------------------
+Applies "soft" [Sift](https://github.com/crcn/sift.js) criteria. These are filters that are applied *after* the initial database pull to further reduce the data.
 
 
 query.limit(limit)

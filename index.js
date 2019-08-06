@@ -58,12 +58,12 @@ function Moody() {
 		},
 		query: {
 			soft: {
+				query: false,
 				select: false,
 				sort: false,
 			},
 		},
-		serve: {
-		},
+		serve: {},
 		tables: {
 			create: true,
 			prefix: '',
