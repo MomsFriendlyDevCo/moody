@@ -1,6 +1,6 @@
 {
   "name": "@momsfriendlydevco/moody",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "MOngoose On DYnamo - Wrapper for AWS, bringing the API closer to Mongoose",
   "main": "index.js",
   "scripts": {
